@@ -28,7 +28,7 @@
 (declare
   (unit lolevel)
   (foreign-declare #<<EOF
-#ifndef C_NONUNIX
+#if !defined(C_NONUNIX) && !defined(__PSP__)
 # include <sys/mman.h>
 #endif
 

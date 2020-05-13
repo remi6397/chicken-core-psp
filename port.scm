@@ -74,7 +74,9 @@
 
 #if !defined(_WIN32)
 # include <sys/ioctl.h>
-# include <termios.h>
+# if !defined(__PSP__)
+#   include <termios.h>
+# endif
 #endif
 
 #if !defined(__ANDROID__) && defined(TIOCGWINSZ)
