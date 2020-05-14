@@ -1,5 +1,6 @@
-# Makefile.psp - configuration for Sony PSP -*- Makefile -*-
+# Makefile.psp - configuration for Sony PlayStation Portable -*- Makefile -*-
 #
+# Copyright (c) 2020, Jeremiasz Nelz
 # Copyright (c) 2013-2020, The CHICKEN Team
 # All rights reserved.
 #
@@ -64,6 +65,7 @@ INCLUDES = -I. -I$(SRCDIR) -I$(shell psp-config --pspsdk-path)/include -I$(shell
 # special files
 
 CHICKEN_CONFIG_H = chicken-config.h
+POSIXFILE = posixpsp
 
 # select default and internal settings
 

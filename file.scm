@@ -153,7 +153,7 @@ readdir(DIR * dir)
 
 static C_word C_fcall C_u_i_symbolic_linkp(C_word path)
 {
-#if !defined(_WIN32) || defined(__CYGWIN__)
+#if !defined(__PSP__) && (!defined(_WIN32) || defined(__CYGWIN__))
   struct stat buf;
   if (lstat(C_c_string(path), &buf) == 0)
     return C_mk_bool(S_ISLNK(buf.st_mode));

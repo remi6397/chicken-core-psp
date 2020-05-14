@@ -73,7 +73,7 @@ DISTFILES = $(filter-out runtime.c,$(LIBCHICKEN_OBJECTS_1:=.c)) \
 	$(foreach lib,$(DYNAMIC_CHICKEN_IMPORT_LIBRARIES),chicken.$(lib).import.scm) \
 	$(foreach lib,$(DYNAMIC_CHICKEN_UNIT_IMPORT_LIBRARIES),chicken.$(lib).import.scm) \
 	$(foreach lib,$(COMPILER_OBJECTS_1),chicken.compiler.$(lib).import.scm) \
-	eval-modules.c posixunix.c posixwin.c
+	eval-modules.c posixunix.c posixwin.c posixpsp.c
 # Remove the duplicate $(POSIXFILE) entry:
 DISTFILES := $(sort $(DISTFILES))
 
@@ -853,6 +853,15 @@ posixunix.c: $(SRCDIR)posix.scm $(SRCDIR)posixunix.scm $(SRCDIR)posix-common.scm
 	-no-module-registration
 posixwin.c: $(SRCDIR)posix.scm $(SRCDIR)posixwin.scm $(SRCDIR)posix-common.scm $(SRCDIR)common-declarations.scm
 	$(bootstrap-lib) -feature platform-windows \
+	-emit-import-library chicken.errno \
+	-emit-import-library chicken.file.posix \
+	-emit-import-library chicken.time.posix \
+	-emit-import-library chicken.process \
+	-emit-import-library chicken.process.signal \
+	-emit-import-library chicken.process-context.posix \
+	-no-module-registration
+posixpsp.c: $(SRCDIR)posix.scm $(SRCDIR)posixpsp.scm $(SRCDIR)posix-common.scm $(SRCDIR)common-declarations.scm
+	$(bootstrap-lib) -feature platform-psp \
 	-emit-import-library chicken.errno \
 	-emit-import-library chicken.file.posix \
 	-emit-import-library chicken.time.posix \

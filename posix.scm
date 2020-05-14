@@ -361,6 +361,8 @@
 	chicken.time)
 
 (cond-expand
+  (platform-psp
+   (include "posixpsp.scm"))
   (platform-unix
    (include "posixunix.scm"))
   (platform-windows
