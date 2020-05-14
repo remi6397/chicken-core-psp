@@ -1,5 +1,6 @@
-;;;; posixunix.scm - Miscellaneous file- and process-handling routines
+;;;; posixpsp.scm - Miscellaneous file-handling routines for Sony PlayStation Portable
 ;
+; Copyright (c) 2020, Jeremiasz Nelz
 ; Copyright (c) 2008-2020, The CHICKEN Team
 ; Copyright (c) 2000-2007, Felix L. Winkelmann
 ; All rights reserved.
@@ -43,14 +44,6 @@ static C_TLS int C_wait_status;
 #include <dirent.h>
 #include <pwd.h>
 #include <utime.h>
-
-#if defined(__sun) && defined(__SVR4)
-# include <sys/tty.h>
-# include <termios.h>
-#endif
-
-#include <sys/mman.h>
-#include <poll.h>
 
 #ifndef O_FSYNC
 # define O_FSYNC O_SYNC
@@ -99,7 +92,15 @@ static C_TLS time_t C_secs;
 static C_TLS struct timeval C_timeval;
 static C_TLS struct stat C_statbuf;
 
-#define C_fchdir(fd)        C_fix(fchdir(C_unfix(fd)))
+#ifdef __PSP__
+static C_word C_fchdir(C_word fd)
+{
+  // TODO: Maybe PSP actually has some way to fchdir?
+  return C_fix(-1);
+}
+#else
+# define C_fchdir(fd)        C_fix(fchdir(C_unfix(fd)))
+#endif
 
 #define open_binary_input_pipe(a, n, name)   C_mpointer(a, popen(C_c_string(name), "r"))
 #define open_text_input_pipe(a, n, name)     open_binary_input_pipe(a, n, name)
@@ -137,7 +138,11 @@ static C_TLS struct stat C_statbuf;
 #define C_close(fd)         C_fix(close(C_unfix(fd)))
 #define C_umask(m)          C_fix(umask(C_unfix(m)))
 
-#define C_u_i_lstat(fn)     C_fix(lstat(C_c_string(fn), &C_statbuf))
+#ifdef __PSP__
+# define C_u_i_lstat(fn)     C_u_i_stat(fn)
+#else
+# define C_u_i_lstat(fn)     C_fix(lstat(C_c_string(fn), &C_statbuf))
+#endif
 
 #define C_u_i_execvp(f,a)   C_fix(execvp(C_c_string(f), (char *const *)C_c_pointer_vector_or_null(a)))
 #define C_u_i_execve(f,a,e) C_fix(execve(C_c_string(f), (char *const *)C_c_pointer_vector_or_null(a), (char *const *)C_c_pointer_vector_or_null(e)))
@@ -252,6 +257,7 @@ C_tm_get( C_word v, void *tm )
 
 static int set_file_mtime(char *filename, C_word atime, C_word mtime)
 {
+#ifndef __PSP__
   struct stat sb;
   struct utimbuf tb;
 
@@ -271,6 +277,9 @@ static int set_file_mtime(char *filename, C_word atime, C_word mtime)
     tb.modtime = C_num_to_int64(mtime);
   }
   return utime(filename, &tb);
+#else
+  return 0;
+#endif
 }
 
 <#
@@ -393,7 +402,7 @@ static int set_file_mtime(char *filename, C_word atime, C_word mtime)
 
 ;;; I/O multiplexing:
 
-(set! chicken.file.posix#file-select
+#;(set! chicken.file.posix#file-select
   (lambda (fdsr fdsw . timeout)
     (let* ((tm (if (pair? timeout) (car timeout) #f))
 	   (fdsrl (cond ((not fdsr) '())
@@ -607,7 +616,7 @@ static int set_file_mtime(char *filename, C_word atime, C_word mtime)
        (##sys#error 'current-user-id!-setter "cannot set user ID" id) ) )
    "(chicken.process-context.posix#current-user-id)"))
 
-(set! chicken.process-context.posix#current-effective-user-id
+#;(set! chicken.process-context.posix#current-effective-user-id
   (getter-with-setter
    (foreign-lambda int "C_geteuid")
    (lambda (id)
@@ -626,7 +635,7 @@ static int set_file_mtime(char *filename, C_word atime, C_word mtime)
       (##sys#error 'current-group-id!-setter "cannot set group ID" id) ) )
    "(chicken.process-context.posix#current-group-id)") )
 
-(set! chicken.process-context.posix#current-effective-group-id
+#;(set! chicken.process-context.posix#current-effective-group-id
   (getter-with-setter 
    (foreign-lambda int "C_getegid")
    (lambda (id)
@@ -717,7 +726,7 @@ static int set_file_mtime(char *filename, C_word atime, C_word mtime)
 
 ;;; Hard and symbolic links:
 
-(set! chicken.file.posix#create-symbolic-link
+#;(set! chicken.file.posix#create-symbolic-link
   (lambda (old new)
     (##sys#check-string old 'create-symbolic-link)
     (##sys#check-string new 'create-symbolic-link)
@@ -730,7 +739,7 @@ static int set_file_mtime(char *filename, C_word atime, C_word mtime)
 
 (define-foreign-variable _filename_max int "FILENAME_MAX")
 
-(define ##sys#read-symbolic-link
+#;(define ##sys#read-symbolic-link
   (let ((buf (make-string (fx+ _filename_max 1))))
     (lambda (fname location)
       (let ((len (##core#inline
@@ -740,7 +749,7 @@ static int set_file_mtime(char *filename, C_word atime, C_word mtime)
             (posix-error #:file-error location "cannot read symbolic link" fname)
             (substring buf 0 len))))))
 
-(set! chicken.file.posix#read-symbolic-link
+#;(set! chicken.file.posix#read-symbolic-link
   (lambda (fname #!optional canonicalize)
     (##sys#check-string fname 'read-symbolic-link)
     (if canonicalize
@@ -761,7 +770,7 @@ static int set_file_mtime(char *filename, C_word atime, C_word mtime)
 		      (##sys#signal-hook #:file-error 'read-symbolic-link "could not canonicalize path with symbolic links, component does not exist" pathname))))))
 	(##sys#read-symbolic-link fname 'read-symbolic-link))))
 
-(set! chicken.file.posix#file-link
+#;(set! chicken.file.posix#file-link
   (let ((link (foreign-lambda int "link" nonnull-c-string nonnull-c-string)))
     (lambda (old new)
       (##sys#check-string old 'file-link)
@@ -1054,10 +1063,12 @@ static int set_file_mtime(char *filename, C_word atime, C_word mtime)
 
 (set! chicken.time.posix#local-timezone-abbreviation
   (foreign-lambda* c-string ()
-   "\n#if !defined(__CYGWIN__) && !defined(__SVR4) && !defined(__uClinux__) && !defined(__hpux__) && !defined(_AIX)\n"
+   "\n#if !defined(__CYGWIN__) && !defined(__SVR4) && !defined(__uClinux__) && !defined(__hpux__) && !defined(_AIX) && !defined(__PSP__)\n"
    "time_t clock = time(NULL);"
    "struct tm *ltm = C_localtime(&clock);"
    "char *z = ltm ? (char *)ltm->tm_zone : 0;"
+   "\n#elif defined(__PSP__)\n"
+   "char *z = (_daylight ? tzname[1] : tzname[0]);"
    "\n#else\n"
    "char *z = (daylight ? tzname[1] : tzname[0]);"
    "\n#endif\n"
@@ -1275,7 +1286,7 @@ static int set_file_mtime(char *filename, C_word atime, C_word mtime)
 
 ;;; chroot:
 
-(set! chicken.process-context.posix#set-root-directory!
+#;(set! chicken.process-context.posix#set-root-directory!
   (let ((chroot (foreign-lambda int "chroot" nonnull-c-string)))
     (lambda (dir)
       (##sys#check-string dir 'set-root-directory!)
@@ -1284,4 +1295,37 @@ static int set_file_mtime(char *filename, C_word atime, C_word mtime)
 
 ;;; unimplemented stuff:
 
+(define-unimplemented chown) ; covers set-file-group! and set-file-owner!
 (set!-unimplemented chicken.process#process-spawn)
+(set!-unimplemented chicken.file.posix#create-fifo)
+(set!-unimplemented chicken.process-context.posix#create-session)
+(set!-unimplemented chicken.file.posix#create-symbolic-link)
+(set!-unimplemented chicken.process-context.posix#current-effective-group-id)
+(set!-unimplemented chicken.process-context.posix#current-effective-user-id)
+(set!-unimplemented chicken.process-context.posix#current-effective-user-name)
+(set!-unimplemented chicken.process-context.posix#current-group-id)
+(set!-unimplemented chicken.process-context.posix#current-user-id)
+(set!-unimplemented chicken.process-context.posix#user-information)
+(set!-unimplemented chicken.file.posix#file-control)
+(set!-unimplemented chicken.file.posix#file-link)
+(set!-unimplemented chicken.file.posix#file-lock)
+(set!-unimplemented chicken.file.posix#file-lock/blocking)
+(set!-unimplemented chicken.file.posix#file-select)
+(set!-unimplemented chicken.file.posix#file-test-lock)
+(set!-unimplemented chicken.file.posix#file-truncate)
+(set!-unimplemented chicken.file.posix#file-unlock)
+(set!-unimplemented chicken.process-context.posix#parent-process-id)
+(set!-unimplemented chicken.process#process-fork)
+(set!-unimplemented chicken.process-context.posix#process-group-id)
+(set!-unimplemented chicken.process#process-signal)
+(set!-unimplemented chicken.file.posix#read-symbolic-link)
+(set!-unimplemented chicken.process.signal#set-alarm!)
+(set!-unimplemented chicken.process-context.posix#set-root-directory!)
+(set!-unimplemented chicken.process.signal#set-signal-mask!)
+(set!-unimplemented chicken.process.signal#signal-mask)
+(set!-unimplemented chicken.process.signal#signal-mask!)
+(set!-unimplemented chicken.process.signal#signal-masked?)
+(set!-unimplemented chicken.process.signal#signal-unmask!)
+(set!-unimplemented chicken.process-context.posix#user-information)
+(set!-unimplemented chicken.time.posix#utc-time->seconds)
+(set!-unimplemented chicken.time.posix#string->time)

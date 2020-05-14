@@ -46,6 +46,11 @@
 # define C_signal_interrupted_p     C_SCHEME_FALSE
 #endif
 
+#ifdef __PSP__
+#include <sys/fd_set.h>
+#include <sys/select.h>
+#endif
+
 #ifdef _WIN32
 /* TODO: Winsock select() only works for sockets */
 # include <winsock2.h>
@@ -55,7 +60,7 @@
 # include <sys/time.h>
 static C_word C_msleep(C_word ms);
 C_word C_msleep(C_word ms) {
-#ifdef __CYGWIN__
+#if defined(__CYGWIN__) || defined(__PSP__)
   if(usleep((useconds_t)C_num_to_uint64(ms) * 1000) == -1) return C_SCHEME_FALSE;
 #else
   struct timespec ts;
@@ -72,10 +77,6 @@ C_word C_msleep(C_word ms) {
 #endif
 
 #ifdef NO_POSIX_POLL
-
-#ifdef __PSP__
-#include <sys/fd_set.h>
-#endif
 
 /* Shouldn't we include <sys/select.h> here? */
 static fd_set C_fdset_input, C_fdset_output;

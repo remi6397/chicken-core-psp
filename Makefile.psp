@@ -32,7 +32,6 @@ ARCH ?= $(shell sh $(SRCDIR)/config-arch.sh)
 
 # options
 
-C_COMPILER_OPTIONS ?= -fno-strict-aliasing -fwrapv -DHAVE_CHICKEN_CONFIG_H
 ifdef DEBUGBUILD
 C_COMPILER_OPTIMIZATION_OPTIONS ?= -g -Wall -Wno-unused
 else
@@ -46,7 +45,6 @@ LINKER_LINK_SHARED_LIBRARY_OPTIONS =
 LINKER_LINK_SHARED_DLOADABLE_OPTIONS =
 LINKER_LINK_SHARED_PROGRAM_OPTIONS =
 #LIBCHICKEN_SO_LINKER_OPTIONS = -Wl,-soname,lib$(PROGRAM_PREFIX)chicken$(PROGRAM_SUFFIX).so.$(BINARYVERSION)
-LIBRARIES = -lc -lm -ldl -llog
 NEEDS_RELINKING = yes
 # See above
 #USES_SONAME = yes
@@ -56,7 +54,11 @@ C_COMPILER = psp-gcc
 CXX_COMPILER = psp-g++
 LIBRARIAN = psp-ar
 
-LIBRARIES = -lc -lm -lpspuser -lpspkernel
+BASE_LIBRARIES = -lc -lm -lpspuser -lpspkernel
+LIBRARIES = $(BASE_LIBRARIES)
+
+# -G0 is very important for anything to run on PSP at all!
+C_COMPILER_OPTIONS ?= $(BASE_LIBRARIES) -G0 -fno-strict-aliasing -fwrapv -DHAVE_CHICKEN_CONFIG_H
 
 PREFIX = $(shell psp-config --psp-prefix)
 
@@ -76,18 +78,19 @@ chicken-config.h: chicken-defaults.h
 	echo "#ifndef __PSP__" >>$@
 	echo "#define __PSP__" >>$@
 	echo "#endif" >>$@
+	echo "#define NO_POSIX_POLL 1" >>$@
 	echo "#define HAVE_DIRENT_H 1" >>$@
 	echo "#define HAVE_DLFCN_H 1" >>$@
 	echo "#define HAVE_INTTYPES_H 1" >>$@
 	echo "#define HAVE_LIMITS_H 1" >>$@
-	echo "#define HAVE_LONG_LONG 1" >>$@
 	echo "#define HAVE_MEMMOVE 1" >>$@
 	echo "#define HAVE_MEMORY_H 1" >>$@
-	echo "#define HAVE_SIGACTION 1" >>$@
+	echo "#ifdef HAVE_SIGACTION" >>$@
+	echo "#undef HAVE_SIGACTION" >>$@
+	echo "#endif" >>$@
 	echo "#ifdef HAVE_SIGSETJMP" >>$@
 	echo "#undef HAVE_SIGSETJMP" >>$@
 	echo "#endif" >>$@
-	echo "#define NO_POSIX_POLL 1" >>$@
 	echo "#define HAVE_STDINT_H 1" >>$@
 	echo "#define HAVE_STDLIB_H 1" >>$@
 	echo "#define HAVE_STRERROR 1" >>$@
@@ -99,7 +102,12 @@ chicken-config.h: chicken-defaults.h
 	echo "#define HAVE_SYS_TYPES_H 1" >>$@
 	echo "#define HAVE_SETENV 1" >>$@
 	echo "#define HAVE_UNISTD_H 1" >>$@
-	echo "#define HAVE_UNSIGNED_LONG_LONG 1" >>$@
+	echo "#ifdef HAVE_UNSIGNED_LONG_LONG" >>$@
+	echo "#undef HAVE_UNSIGNED_LONG_LONG" >>$@
+	echo "#endif" >>$@
+	echo "#ifdef HAVE_LONG_LONG" >>$@
+	echo "#undef HAVE_LONG_LONG" >>$@
+	echo "#endif" >>$@
 	echo "#define STDC_HEADERS 1" >>$@
 	echo "#define HAVE_ALLOCA 1" >>$@
 	echo "#define HAVE_ALLOCA_H 1" >>$@

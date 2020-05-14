@@ -71,6 +71,7 @@
 #if !defined(C_NONUNIX)
 
 #ifdef __PSP__
+# include <sys/select.h>
 # include <time.h>
 #endif
 
@@ -84,7 +85,11 @@
 #  define C_PROFILE_SIGNAL SIGALRM
 #  define C_PROFILE_TIMER  ITIMER_REAL
 # else
-#  define C_PROFILE_SIGNAL SIGPROF
+#   ifdef __PSP__
+#     define C_PROFILE_SIGNAL -1          /* Stupid way to avoid error */
+#   else
+#     define C_PROFILE_SIGNAL SIGPROF
+#   endif
 #  define C_PROFILE_TIMER  ITIMER_PROF
 # endif
 
@@ -853,7 +858,7 @@ int CHICKEN_initialize(int heap, int stack, int symbols, void *toplevel)
   initialize_symbol_table();
 
   if (profiling) {
-#ifndef C_NONUNIX
+#if !defined(C_NONUNIX) && !defined(__PSP__)
 # ifdef HAVE_SIGACTION
     C_sigaction(C_PROFILE_SIGNAL, &sa, NULL);
 # else
@@ -2085,7 +2090,7 @@ C_regparm time_t C_fcall C_seconds(C_long *ms)
 
 C_regparm C_u64 C_fcall C_cpu_milliseconds(void)
 {
-#if defined(C_NONUNIX) || defined(__CYGWIN__)
+#if defined(C_NONUNIX) || defined(__CYGWIN__) || defined(__PSP__)
     if(CLOCKS_PER_SEC == 1000) return clock();
     else return ((C_u64)clock() / CLOCKS_PER_SEC) * 1000;
 #else
@@ -4454,7 +4459,9 @@ VOID CALLBACK win_timer(PVOID data_ignored, BOOLEAN wait_or_fired)
 
 static void set_profile_timer(C_uword freq)
 {
-#ifdef C_NONUNIX
+#if defined(__PSP__)
+  goto error;
+#elif defined(C_NONUNIX)
   static HANDLE timer = NULL;
 
   if (freq == 0) {
@@ -12083,7 +12090,7 @@ C_a_i_cpu_time(C_word **a, int c, C_word buf)
 {
   C_word u, s = C_fix(0);
 
-#if defined(C_NONUNIX) || defined(__CYGWIN__)
+#if defined(C_NONUNIX) || defined(__CYGWIN__) || defined(__PSP__)
   if(CLOCKS_PER_SEC == 1000) u = clock();
   else u = C_uint64_to_num(a, ((C_u64)clock() / CLOCKS_PER_SEC) * 1000);
 #else
