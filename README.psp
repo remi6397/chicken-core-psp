@@ -1,0 +1,22 @@
+Chicken Scheme port for Sony PlayStation Portable
+=================================================
+
+Current status:
+---------------
+
+Many basic things work, but ``posixpsp.scm`` is incomplete and possibly very buggy.
+
+Building
+--------
+
+First of all, install PSPSDK and make sure it works properly.
+
+After you make sure it works properly and compiles executables that work on your PSP, issue the following command:
+
+```sh
+make clean && make -j12 PLATFORM=psp libchicken.a
+```
+
+Replace ``-j12`` so that it reflects number of threads/cores available on your build machine.
+
+After build succeeds, you can test if everything works properly with the dedicated example project (``psp_chicken_demo``).
