@@ -73,6 +73,10 @@ C_word C_msleep(C_word ms) {
 
 #ifdef NO_POSIX_POLL
 
+#ifdef __PSP__
+#include <sys/fd_set.h>
+#endif
+
 /* Shouldn't we include <sys/select.h> here? */
 static fd_set C_fdset_input, C_fdset_output;
 

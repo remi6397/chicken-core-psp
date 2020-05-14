@@ -70,6 +70,10 @@
 
 #if !defined(C_NONUNIX)
 
+#ifdef __PSP__
+# include <time.h>
+#endif
+
 # include <sys/time.h>
 # include <sys/resource.h>
 # include <sys/wait.h>
@@ -4996,6 +5000,10 @@ C_regparm C_word C_fcall C_execute_shell_command(C_word string)
 
   return C_fix(n);
 }
+
+#ifdef __PSP__
+#include <sys/fd_set.h>
+#endif
 
 /*
  * TODO: Implement something for Windows that supports selecting on
@@ -11660,7 +11668,7 @@ void C_ccall C_decode_seconds(C_word c, C_word *av)
 #ifdef C_GNU_ENV
                   /* negative for west of UTC, but we want positive */
 		  C_fix(-tmt->tm_gmtoff)
-#elif defined(__CYGWIN__) || defined(__MINGW32__) || defined(_WIN32) || defined(__WINNT__)
+#elif defined(__CYGWIN__) || defined(__MINGW32__) || defined(_WIN32) || defined(__WINNT__) || defined(__PSP__)
                   C_fix(mode == C_SCHEME_FALSE ? _timezone : 0) /* does not account for DST */
 #else
                   C_fix(mode == C_SCHEME_FALSE ? timezone : 0)  /* does not account for DST */
