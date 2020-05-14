@@ -238,9 +238,13 @@ EOF
 
 (define getservbyname
   (foreign-lambda* int ((c-string serv) (c-string proto))
-    "struct servent *se;
+    "#ifndef __PSP__
+     struct servent *se;
      if((se = getservbyname(serv, proto)) == NULL) C_return(0);
-     else C_return(ntohs(se->s_port));") )     
+     else C_return(ntohs(se->s_port));
+     #else
+     C_return(0); // PSP has no servent :(
+     #endif") )
 
 (define gethostaddr
   (foreign-lambda* bool ((scheme-pointer saddr) (c-string host) (unsigned-short port))
