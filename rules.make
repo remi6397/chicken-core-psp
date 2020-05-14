@@ -484,12 +484,14 @@ $(foreach lib, $(COMPILER_OBJECTS_1),\
           $(eval $(call declare-emitted-compiler-import-lib-dependency,$(lib))))
 
 # special cases for modules not corresponding directly to units
+ifneq ($(POSIXFILE),)
 $(eval $(call declare-emitted-import-lib-dependency,chicken.errno,$(POSIXFILE)))
 $(eval $(call declare-emitted-import-lib-dependency,chicken.file.posix,$(POSIXFILE)))
 $(eval $(call declare-emitted-import-lib-dependency,chicken.time.posix,$(POSIXFILE)))
 $(eval $(call declare-emitted-import-lib-dependency,chicken.process,$(POSIXFILE)))
 $(eval $(call declare-emitted-import-lib-dependency,chicken.process.signal,$(POSIXFILE)))
 $(eval $(call declare-emitted-import-lib-dependency,chicken.process-context.posix,$(POSIXFILE)))
+endif
 $(eval $(call declare-emitted-import-lib-dependency,chicken.bitwise,library))
 $(eval $(call declare-emitted-import-lib-dependency,chicken.blob,library))
 $(eval $(call declare-emitted-import-lib-dependency,chicken.fixnum,library))

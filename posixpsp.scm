@@ -1,32 +1,90 @@
-;;;; posixpsp.scm - Miscellaneous file-handling routines, available on Sony PlayStation Portable
-;
-; Copyright (c) 2020, Jeremiasz Nelz
-; Copyright (c) 2008-2020, The CHICKEN Team
-; Copyright (c) 2000-2007, Felix L. Winkelmann
-; All rights reserved.
-;
-; Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following
-; conditions are met:
-;
-;   Redistributions of source code must retain the above copyright notice, this list of conditions and the following
-;     disclaimer.
-;   Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following
-;     disclaimer in the documentation and/or other materials provided with the distribution.
-;   Neither the name of the author nor the names of its contributors may be used to endorse or promote
-;     products derived from this software without specific prior written permission.
-;
-; THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS
-; OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
-; AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR
-; CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-; CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-; SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-; THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
-; OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-; POSSIBILITY OF SUCH DAMAGE.
-
-
-(define-foreign-variable _stat_st_blksize scheme-object "C_SCHEME_UNDEFINED")
-(define-foreign-variable _stat_st_blocks scheme-object "C_SCHEME_UNDEFINED")
-
 (include "posix-common.scm")
+
+(set!-unimplemented chicken.file.posix#fcntl/dupfd)
+(set!-unimplemented chicken.file.posix#fcntl/getfd)
+(set!-unimplemented chicken.file.posix#fcntl/setfd)
+(set!-unimplemented chicken.file.posix#fcntl/getfl)
+(set!-unimplemented chicken.file.posix#fcntl/setfl)
+(set!-unimplemented chicken.file.posix#open/nonblock)
+(set!-unimplemented chicken.file.posix#open/noctty)
+(set!-unimplemented chicken.file.posix#open/fsync)
+(set!-unimplemented chicken.file.posix#open/sync)
+(set!-unimplemented chicken.file.posix#open/noinherit)
+(set!-unimplemented chicken.process#spawn/overlay)
+(set!-unimplemented chicken.process#spawn/wait)
+(set!-unimplemented chicken.process#spawn/nowait)
+(set!-unimplemented chicken.process#spawn/nowaito)
+(set!-unimplemented chicken.process#spawn/detach)
+(set!-unimplemented chicken.file.posix#perm/isvtx)
+(set!-unimplemented chicken.file.posix#perm/isuid)
+(set!-unimplemented chicken.file.posix#perm/isgid)
+(set!-unimplemented chicken.file.posix#file-control)
+(set!-unimplemented chicken.file.posix#file-open)
+(set!-unimplemented chicken.file.posix#file-close)
+(set!-unimplemented chicken.file.posix#file-read)
+(set!-unimplemented chicken.file.posix#file-write)
+(set!-unimplemented chicken.file.posix#file-mkstemp)
+(set!-unimplemented chicken.file.posix#file-select)
+(set!-unimplemented chicken.process#create-pipe)
+(set!-unimplemented chicken.process.signal#signal/term)
+(set!-unimplemented chicken.process.signal#signal/kill)
+(set!-unimplemented chicken.process.signal#signal/int)
+(set!-unimplemented chicken.process.signal#signal/hup)
+(set!-unimplemented chicken.process.signal#signal/fpe)
+(set!-unimplemented chicken.process.signal#signal/ill)
+(set!-unimplemented chicken.process.signal#signal/segv)
+(set!-unimplemented chicken.process.signal#signal/abrt)
+(set!-unimplemented chicken.process.signal#signal/trap)
+(set!-unimplemented chicken.process.signal#signal/quit)
+(set!-unimplemented chicken.process.signal#signal/alrm)
+(set!-unimplemented chicken.process.signal#signal/vtalrm)
+(set!-unimplemented chicken.process.signal#signal/prof)
+(set!-unimplemented chicken.process.signal#signal/io)
+(set!-unimplemented chicken.process.signal#signal/urg)
+(set!-unimplemented chicken.process.signal#signal/chld)
+(set!-unimplemented chicken.process.signal#signal/cont)
+(set!-unimplemented chicken.process.signal#signal/stop)
+(set!-unimplemented chicken.process.signal#signal/tstp)
+(set!-unimplemented chicken.process.signal#signal/pipe)
+(set!-unimplemented chicken.process.signal#signal/xcpu)
+(set!-unimplemented chicken.process.signal#signal/xfsz)
+(set!-unimplemented chicken.process.signal#signal/usr1)
+(set!-unimplemented chicken.process.signal#signal/usr2)
+(set!-unimplemented chicken.process.signal#signal/winch)
+(set!-unimplemented chicken.process.signal#signal/bus)
+(set!-unimplemented chicken.process.signal#signal/break)
+(set!-unimplemented chicken.process.signal#signals-list)
+(set!-unimplemented chicken.process.signal#set-signal-mask!)
+(set!-unimplemented chicken.process.signal#signal-masked?)
+(set!-unimplemented chicken.process.signal#signal-mask!)
+(set!-unimplemented chicken.process.signal#signal-unmask!)
+(set!-unimplemented chicken.process-context.posix#current-user-id)
+(set!-unimplemented chicken.process-context.posix#current-effective-user-id)
+(set!-unimplemented chicken.process-context.posix#current-group-id)
+(set!-unimplemented chicken.process-context.posix#current-effective-group-id)
+(set!-unimplemented chicken.process-context.posix#user-information)
+(set!-unimplemented chicken.process-context.posix#current-user-name)
+(set!-unimplemented chicken.process-context.posix#current-effective-user-name)
+(set!-unimplemented chicken.process-context.posix#create-session)
+(set!-unimplemented chicken.process-context.posix#process-group-id)
+(set!-unimplemented chicken.file.posix#create-symbolic-link)
+(set!-unimplemented chicken.file.posix#read-symbolic-link)
+(set!-unimplemented chicken.file.posix#file-link)
+(set!-unimplemented chicken.file.posix#file-truncate)
+(set!-unimplemented chicken.file.posix#file-lock)
+(set!-unimplemented chicken.file.posix#file-lock/blocking)
+(set!-unimplemented chicken.file.posix#file-test-lock)
+(set!-unimplemented chicken.file.posix#file-unlock)
+(set!-unimplemented chicken.file.posix#create-fifo)
+(set!-unimplemented chicken.time.posix#string->time)
+(set!-unimplemented chicken.time.posix#utc-time->seconds)
+(set!-unimplemented chicken.time.posix#local-timezone-abbreviation)
+(set!-unimplemented chicken.process.signal#set-alarm!)
+(set!-unimplemented chicken.process#process-fork)
+(set!-unimplemented chicken.process#process-execute)
+(set!-unimplemented chicken.process-context.posix#parent-process-id)
+(set!-unimplemented chicken.process#process-signal)
+(set!-unimplemented chicken.process#process-run)
+(set!-unimplemented chicken.process#process)
+(set!-unimplemented chicken.process#process*)
+(set!-unimplemented chicken.process-context.posix#set-root-directory!)
