@@ -737,6 +737,17 @@ posixwin.c: posixwin.scm \
 		chicken.process-context.import.scm \
 		chicken.string.import.scm \
 		chicken.time.import.scm
+posixpsp.c: posixpsp.scm \
+		chicken.condition.import.scm \
+		chicken.bitwise.import.scm \
+		chicken.foreign.import.scm \
+		chicken.memory.import.scm \
+		chicken.pathname.import.scm \
+		chicken.platform.import.scm \
+		chicken.port.import.scm \
+		chicken.process-context.import.scm \
+		chicken.string.import.scm \
+		chicken.time.import.scm
 data-structures.c: data-structures.scm \
 		chicken.condition.import.scm \
 		chicken.fixnum.import.scm \
