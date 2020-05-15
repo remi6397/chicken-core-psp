@@ -28,7 +28,10 @@ SRCDIR ?= ./
 
 # platform configuration
 
-ARCH ?= $(shell sh $(SRCDIR)/config-arch.sh)
+ARCH ?= mipsallegrexel-psp
+
+PSPSDK_PATH = $(shell psp-config --pspsdk-path)
+PSP_PREFIX = $(shell psp-config --psp-prefix)
 
 # options
 
@@ -49,20 +52,22 @@ NEEDS_RELINKING = yes
 # See above
 #USES_SONAME = yes
 
-STATICBUILD = yes
-C_COMPILER = psp-gcc
-CXX_COMPILER = psp-g++
-LIBRARIAN = psp-ar
+C_COMPILER_SHARED_OPTIONS =
 
-BASE_LIBRARIES = -lc -lm -lpspuser -lpspkernel
+STATICBUILD = yes
+HOSTSYSTEM = psp
+
+PSPSDK_LIBS = -lpspdebug -lpspdisplay -lpspge -lpspctrl -lpspsdk
+BASE_LIBRARIES = -L$(PSP_PREFIX)/lib -L$(PSPSDK_PATH)/lib $(PSPSDK_LIBS) -lc -lm -lpspnet \
+	-lpspnet_inet -lpspnet_apctl -lpspnet_resolver -lpsputility -lpspuser
 LIBRARIES = $(BASE_LIBRARIES)
 
 # -G0 is very important for anything to run on PSP at all!
 C_COMPILER_OPTIONS ?= $(BASE_LIBRARIES) -G0 -fno-strict-aliasing -fwrapv -DHAVE_CHICKEN_CONFIG_H
 
-PREFIX = $(shell psp-config --psp-prefix)
+PREFIX = $(PSP_PREFIX)
 
-INCLUDES = -I. -I$(SRCDIR) -I$(shell psp-config --pspsdk-path)/include -I$(shell psp-config --psp-prefix)/include
+INCLUDES = -I. -I$(SRCDIR) -I$(PSPSDK_PATH)/include -I$(PSP_PREFIX)/include
 
 # special files
 
