@@ -1,22 +1,30 @@
 Chicken Scheme port for Sony PlayStation Portable
 =================================================
 
-Current status:
----------------
+Project Status
+--------------
 
-Many basic things work, but ``posixpsp.scm`` is incomplete and possibly very buggy.
+Many useful things work, but ``posixpsp.scm`` is incomplete and possibly very buggy.
+
+Also, I haven't completed writing PSP bindings for CHICKEN yet, so you probably have to do that on your own (or wait ;) ).
 
 Building
 --------
 
-First of all, install PSPSDK and make sure it works properly.
+First of all, install [PSPSDK](https://github.com/pspdev) and make sure it works properly.
 
-After you make sure it works properly and compiles executables that work on your PSP, issue the following command:
+After making sure several times that it works properly and compiles sample executables that work on your real PSP, follow the steps below:
 
-```sh
-make clean && make -j12 PLATFORM=psp libchicken.a
-```
-
-Replace ``-j12`` so that it reflects number of threads/cores available on your build machine.
-
-After build succeeds, you can test if everything works properly with the dedicated example project (``psp_chicken_demo``).
+1.  Compile library for PSP
+    ```sh
+    make clean && \
+    make PREFIX=$(psp-config --psp-prefix) PLATFORM=psp \
+        libchicken.a install-target install-libs install-dev install-other-files
+    ```
+2.  Compile cross toolchain for use on build PC
+    ```sh
+    make PREFIX=$(psp-config --pspdev-path) PLATFORM=linux TARGETSYSTEM=psp PROGRAM_PREFIX=psp TARGET_PREFIX=$(psp-config --psp-prefix) \
+        TARGET_LIBRARIES='-lpspdebug -lpspdisplay -lpspge -lpspctrl -lpspsdk -lc -lm -lpspnet -lpspnet_inet -lpspnet_apctl -lpspnet_resolver -lpsputility -lpspuser' \
+        install
+    ```
+3.  *(Optional)*&nbsp;&nbsp;Clone the [sample game written in CHICKEN](https://github.com/remi6397/psp_chicken_demo) to make sure your cross toolchain works
