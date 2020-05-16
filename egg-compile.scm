@@ -104,7 +104,9 @@
     ((windows) "cd /d")))
 
 (define (uses-compiled-import-library? mode)
-  (not (and (eq? mode 'host) staticbuild)))
+  (if (eq? mode 'target)
+      #f
+      (not (and (eq? mode 'host) staticbuild))))
 
 
 ;;; topological sort with cycle check
